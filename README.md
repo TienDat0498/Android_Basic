@@ -1,5 +1,5 @@
 # Android_app
 
-Finished project
-## Calculator
+##Finished project
+### Calculator
   Notes: Only using with interger
