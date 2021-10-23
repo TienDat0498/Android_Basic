@@ -1,10 +1,13 @@
 package com.example.calculator
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.lang.Math.pow
+import kotlin.math.pow
 
 class MainActivity : AppCompatActivity(), View.OnClickListener  {
     private lateinit var btn0: Button
@@ -105,6 +108,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
             R.id.btnDelete -> clickDelete()
             R.id.btnClear -> clickClear()
             R.id.btnAC -> clickAC()
+            R.id.btnDot -> clickDot()
 
 
         }
@@ -115,8 +119,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
             clickAC()
             isClickEqual=false
         }
-        if(!isOutOfBound(parseToLong(curString))) curString+=num.toString()
+        if(!isOutOfBound(parseToDouble(curString))) curString+=num.toString()
         showCurrent()
+    }
+
+    private fun clickDot(){
+        if(isClickEqual){
+            clickAC()
+            isClickEqual=false
+        }
+        if(!isOutOfBound(parseToDouble(curString)) and ('.' !in curString)) curString+='.'
     }
 
     private fun clickOperator(ope: String){
@@ -149,14 +161,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
             operator = ""
         }
         else if(lastString.isNotEmpty() and curString.isNotEmpty()){
-            var result: Long = parseToLong(curString)
+            var result: Double = parseToDouble(curString)
             when(operator){
-                "+" -> result = parseToLong(lastString) + parseToLong(curString)
-                "-" -> result = parseToLong(lastString) - parseToLong(curString)
-                "x" -> result = parseToLong(lastString) * parseToLong(curString)
-                "/" -> result = parseToLong(lastString) / parseToLong(curString)
+                "+" -> result = parseToDouble(lastString) + parseToDouble(curString)
+                "-" -> result = parseToDouble(lastString) - parseToDouble(curString)
+                "x" -> result = parseToDouble(lastString) * parseToDouble(curString)
+                "/" -> result = parseToDouble(lastString) / parseToDouble(curString)
             }
             curString = result.toString()
+            Log.d("AAA", curString)
+            if (curString.toDouble()> 10.0.pow(11.0)){
+                clickAC()
+                txtView.text = "OOB ERROR"
+                return
+            }
             operator = ""
             showCurrent()
 
@@ -181,21 +199,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
         showCurrent()
     }
 
-    private fun isOutOfBound(num: Long):Boolean{
-        if(num.toString().length>=12) return true
+    private fun isOutOfBound(num: Double):Boolean{
+        if(num.toString().length>=12 || (num.toString().indexOf('.') >=13)) {
+            return true
+        }
         return false
     }
 
     private fun showCurrent(){
-        curString = parseToLong(curString).toString()
-        txtView.text = parseToLong(curString).toString()
+        var tmpDot = false
+        if (curString.isNotEmpty() && curString[curString.length-1] == '.') tmpDot=true
+        curString = parseToDouble(curString).toString()
+
+        if (tmpDot) curString+='.'
+        else if (parseToDouble(curString)%1==0.0) curString = parseToLong(curString).toString()
+//        if (curString.length>12) curString = curString.substring(0,13)
+        txtView.text = curString
+    }
+
+    private fun parseToDouble(numString: String):Double{
+        if(numString.isEmpty()){
+            return 0.0
+        }
+        return numString.toDouble()
     }
 
     private fun parseToLong(numString: String):Long{
         if(numString.isEmpty()){
             return 0
         }
-        return numString.toLong()
+        return numString.toDouble().toLong()
     }
-
 }
