@@ -2,4 +2,4 @@
 
 ## Finished project
 ### Calculator
-  Notes: Only using with interger
+  Bug: Not precise for small number 
